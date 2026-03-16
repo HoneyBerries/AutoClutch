@@ -3,9 +3,9 @@
 	"id": "autoclutch",
 	"version": "${version}",
 	"name": "AutoClutch",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Automatic water bucket clutching with human-like timing. Helps you survive falls without dying!",
 	"authors": [
-		"Me!"
+		"HoneyBerries"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
