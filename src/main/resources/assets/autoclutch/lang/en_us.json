@@ -15,11 +15,11 @@
   "config.autoclutch.group.timing": "Timing Settings",
   "config.autoclutch.group.timing.description": "Configure when the water bucket is placed during a fall. Higher mean = earlier placement, higher variance = more variation in timing.",
 
-  "config.autoclutch.mean": "Mean Distance (blocks)",
-  "config.autoclutch.mean.description": "Average distance above ground when water is placed. Range: 1.5-4.5 blocks. Recommended: 2.5 blocks for skilled play.",
+  "config.autoclutch.mean": "Mean Distance",
+  "config.autoclutch.mean.description": "Average distance in blocks above ground when water is placed. Range: 1.5-4.0 blocks. Recommended: 2.5 blocks.",
 
-  "config.autoclutch.variance": "Variance (blocks)",
-  "config.autoclutch.variance.description": "How much the timing varies (standard deviation). Higher = more human-like variation. Range: 0.5-2.5 blocks. Recommended: 1.2 blocks.",
+  "config.autoclutch.variance": "Variance",
+  "config.autoclutch.variance.description": "How much the timing varies, in blocks (standard deviation). Higher = more human-like variation. Safe range: 0.5-2.0 blocks. Recommended: 1.2 blocks.",
 
   "text.autoclutch.enabled": "AutoClutch Enabled",
   "text.autoclutch.disabled": "AutoClutch Disabled"

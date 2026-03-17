@@ -12,41 +12,54 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
 
+/**
+ * Client-side initializer for the AutoClutch mod.
+ * <p>
+ * Handles keybinding registration, tick event registration, and toggling the mod on/off.
+ */
 public class AutoClutchClient implements ClientModInitializer {
-	private static KeyMapping toggleKey;
-	private static final ClutchHandler clutchHandler = new ClutchHandler();
+    /** Keybinding for toggling AutoClutch on/off. */
+    private static KeyMapping toggleKey;
+    /** Handles the clutch logic each tick. */
+    private static final ClutchHandler clutchHandler = new ClutchHandler();
 
-	@Override
-	public void onInitializeClient() {
-		// Load config
-		AutoClutchConfig.load();
+    /**
+     * Called by Fabric when the client is initializing.
+     * Registers keybindings, tick events, and loads config.
+     */
+    @Override
+    public void onInitializeClient() {
+        // Load configuration from disk
+        AutoClutchConfig.load();
 
-		// Register keybinding
-		toggleKey = new KeyMapping(
-				"key.autoclutch.toggle",
-				InputConstants.Type.KEYSYM,
-				GLFW.GLFW_KEY_B,
-				Category.MISC
-		);
-		KeyBindingHelper.registerKeyBinding(toggleKey);
+        // Register the keybinding for toggling the mod
+        toggleKey = new KeyMapping(
+                "key.autoclutch.toggle",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_B,
+                Category.MISC
+        );
+        KeyBindingHelper.registerKeyBinding(toggleKey);
 
-		// Register tick event for clutch handler
-		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-			clutchHandler.tick(client);
+        // Register a tick event to run clutch logic and handle keybinds
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            clutchHandler.tick(client);
 
-			// Handle toggle keybind
-			while (toggleKey.consumeClick()) {
-				boolean newState = !AutoClutchConfig.getInstance().enabled;
-				AutoClutchConfig.getInstance().enabled = newState;
-				AutoClutchConfig.save();
+            // Handle toggle keybind presses
+            while (toggleKey.consumeClick()) {
+                boolean newState = !AutoClutchConfig.getInstance().enabled;
+                AutoClutchConfig.getInstance().enabled = newState;
+                AutoClutchConfig.save();
 
-				if (client.player != null) {
-					String key = newState ? "text.autoclutch.enabled" : "text.autoclutch.disabled";
-					client.player.displayClientMessage(Component.translatable(key), true);
-				}
-			}
-		});
+                // Show a message to the player when toggling
+                if (client.player != null) {
+                    String key = newState ? "text.autoclutch.enabled" : "text.autoclutch.disabled";
+                    client.player.displayClientMessage(Component.translatable(key), true);
+                }
+            }
+        });
 
-		AutoClutch.LOGGER.info("AutoClutch initialized!");
-	}
+        // Log initialization
+        AutoClutch.LOGGER.info("AutoClutch initialized!");
+    }
 }

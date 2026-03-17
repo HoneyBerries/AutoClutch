@@ -1,5 +1,6 @@
 package net.honeyberries.clutch;
 
+import net.honeyberries.AutoClutch;
 import net.honeyberries.config.AutoClutchConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -9,19 +10,38 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
 
+import java.util.Objects;
 import java.util.Random;
 
+/**
+ * Handles automatic water bucket clutching for the player.
+ * <p>
+ * This class detects when the player is falling and, if holding a water bucket, attempts to place water
+ * at a configurable distance from the ground to prevent fall damage. The trigger distance is sampled
+ * from a truncated normal distribution to simulate human-like reaction times.
+ */
 public class ClutchHandler {
+    /** Random instance for sampling trigger distances. */
     private static final Random random = new Random();
+    /** True if the player is currently falling and clutch logic is active. */
     private boolean isFalling = false;
+    /** True if the clutch action has already been triggered during this fall. */
     private boolean hasTriggered = false;
+    /** The target distance (in blocks) from the ground to trigger the clutch. */
     private double targetDistanceBlocks = -1;
 
+    private final Logger logger = AutoClutch.LOGGER;
+
+    /**
+     * Called every client tick to update clutch logic.
+     *
+     * @param client The Minecraft client instance.
+     */
     public void tick(Minecraft client) {
+        // If the mod is disabled, reset state and do nothing
         if (!AutoClutchConfig.getInstance().enabled) {
             reset();
             return;
@@ -33,11 +53,13 @@ public class ClutchHandler {
             return;
         }
 
-        // Check if player is falling
-        boolean currentlyFalling = player.getDeltaMovement().y < -0.5 && !player.onGround();
+        // Check if player is falling and will take damage
+        boolean willTakeDamage = player.fallDistance > 3.0f
+                && !player.onGround()
+                && Objects.requireNonNull(player.gameMode()).isSurvival();
 
-        // Reset if no longer falling or on ground
-        if (!currentlyFalling || player.onGround()) {
+        // Reset if conditions aren't met
+        if (!willTakeDamage) {
             reset();
             return;
         }
@@ -74,12 +96,21 @@ public class ClutchHandler {
         }
     }
 
+    /**
+     * Resets the clutch handler state for a new fall or when clutching is not needed.
+     */
     private void reset() {
         isFalling = false;
         hasTriggered = false;
         targetDistanceBlocks = -1;
     }
 
+    /**
+     * Checks if the player is holding a water bucket in either hand.
+     *
+     * @param player The player to check.
+     * @return True if the player is holding a water bucket.
+     */
     private boolean isHoldingWaterBucket(LocalPlayer player) {
         ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
@@ -87,6 +118,13 @@ public class ClutchHandler {
         return mainHand.is(Items.WATER_BUCKET) || offHand.is(Items.WATER_BUCKET);
     }
 
+    /**
+     * Calculates the vertical distance from the player to the nearest solid ground below.
+     *
+     * @param player The player whose position to check.
+     * @param level  The world level.
+     * @return The distance in blocks to the ground, or -1 if no ground found within 100 blocks.
+     */
     private double getDistanceToGround(LocalPlayer player, Level level) {
         Vec3 playerPos = player.position();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
@@ -94,13 +132,13 @@ public class ClutchHandler {
         // Start from player position and raycast downward
         double startY = playerPos.y;
 
-        // Check up to 100 blocks down
-        for (int i = 0; i < 100; i++) {
+        // Check up to 128 blocks down
+        for (int i = 0; i < 128; i++) {
             pos.set(playerPos.x, startY - i, playerPos.z);
             BlockState state = level.getBlockState(pos);
 
             // Found a solid block
-            if (!state.isAir() && state.isSolid()) {
+            if (!state.isAir() && state.isCollisionShapeFullBlock(level, pos)) {
                 double groundY = pos.getY() + 1.0; // Top of the block
                 return playerPos.y - groundY;
             }
@@ -110,18 +148,28 @@ public class ClutchHandler {
         return -1;
     }
 
+    /**
+     * Attempts to place a water bucket using the correct hand.
+     *
+     * @param client The Minecraft client instance.
+     * @param player The player performing the action.
+     */
     private void placeWaterBucket(Minecraft client, LocalPlayer player) {
-        // Determine which hand has the water bucket
+        if (client.gameMode == null) return;
+
+        // Determine which hand is holding the water bucket
         InteractionHand hand = InteractionHand.MAIN_HAND;
+
+        // Check if main hand is NOT a water bucket.
+        // If it's not, we check if the off-hand IS a water bucket.
         if (!player.getItemInHand(InteractionHand.MAIN_HAND).is(Items.WATER_BUCKET)) {
             hand = InteractionHand.OFF_HAND;
         }
 
-        // Use the vanilla interaction system - this creates the exact same packet as a real click
-        if (client.gameMode != null) {
-            client.gameMode.useItem(player, hand);
-        }
+        // Use the item in the identified hand
+        client.gameMode.useItem(player, hand);
     }
+
 
     /**
      * Sample from a truncated normal distribution.
@@ -136,7 +184,7 @@ public class ClutchHandler {
     private double sampleTruncatedNormal(double mean, double stddev, double min, double max) {
         double sample;
         int attempts = 0;
-        final int maxAttempts = 1000; // Safety limit
+        final int maxAttempts = 16; // Safety limit
 
         do {
             sample = mean + random.nextGaussian() * stddev;
@@ -148,6 +196,8 @@ public class ClutchHandler {
                 break;
             }
         } while (sample < min || sample > max);
+
+        logger.info("Sample {} from truncated normal distribution with mean {} and standard deviation {}", sample, mean, stddev);
 
         return sample;
     }

@@ -49,6 +49,12 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
+
+	// Optional config UI integrations (ModMenu + YACL)
+	modCompileOnly("com.terraformersmc:modmenu:${providers.gradleProperty("modmenu_version").get()}")
+	modLocalRuntime("com.terraformersmc:modmenu:${providers.gradleProperty("modmenu_version").get()}")
+	modCompileOnly("dev.isxander:yet-another-config-lib:${providers.gradleProperty("yacl_version").get()}")
+	modLocalRuntime("dev.isxander:yet-another-config-lib:${providers.gradleProperty("yacl_version").get()}")
 }
 
 tasks.processResources {
