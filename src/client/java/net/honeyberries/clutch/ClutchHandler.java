@@ -5,6 +5,7 @@ import net.honeyberries.config.AutoClutchConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -33,6 +34,9 @@ public class ClutchHandler {
     /** True if the clutch action has already been triggered during this fall. */
     private boolean hasTriggered = false;
 
+    /** True once we're in the placement window so we can retry until water is placed. */
+    private boolean attemptingPlacement = false;
+
     /** The target distance (in blocks) from the ground to trigger the clutch. */
     private double targetDistanceBlocks = -1;
 
@@ -60,8 +64,9 @@ public class ClutchHandler {
         }
 
         // Check if player is falling and will take damage
-        boolean willTakeDamage = player.fallDistance > 3.0
-                && !player.onGround()
+        boolean falling = !player.onGround() && player.getDeltaMovement().y < -0.08;
+        boolean willTakeDamage = falling
+                && player.fallDistance > 2.0
                 && Objects.requireNonNull(player.gameMode()).isSurvival();
 
         // Reset if conditions aren't met
@@ -74,6 +79,7 @@ public class ClutchHandler {
         if (!isActiveAndFalling) {
             isActiveAndFalling = true;
             hasTriggered = false;
+            attemptingPlacement = false;
             targetDistanceBlocks = sampleTruncatedNormal(
                     AutoClutchConfig.getInstance().meanBlocks,
                     AutoClutchConfig.getInstance().varianceBlocks,
@@ -92,13 +98,30 @@ public class ClutchHandler {
             return;
         }
 
-        // Calculate distance to ground
-        double distanceToGround = getDistanceToGround(player, client.level);
+        Level level = client.level;
 
-        // Trigger water bucket placement when we reach target distance
-        if (distanceToGround > 0 && distanceToGround <= targetDistanceBlocks) {
-            placeWaterBucket(client, player);
-            hasTriggered = true;
+        // Calculate distance to ground
+        double distanceToGround = getDistanceToGround(player, level);
+
+        // Use the configured timing but enforce a minimum buffer so we never trigger too late
+        double safeTriggerDistance = Math.max(
+                targetDistanceBlocks,
+                AutoClutchConfig.MIN_BLOCKS + 0.75
+        );
+
+        boolean withinTriggerWindow = distanceToGround > 0 && distanceToGround <= safeTriggerDistance;
+        boolean inFailsafeWindow = distanceToGround > 0 && distanceToGround <= AutoClutchConfig.MIN_BLOCKS + 0.5;
+
+        if (withinTriggerWindow) {
+            attemptingPlacement = true;
+        }
+
+        if (attemptingPlacement || inFailsafeWindow) {
+            boolean placed = placeWaterBucket(client, player, level);
+            if (placed) {
+                hasTriggered = true;
+                attemptingPlacement = false;
+            }
         }
     }
 
@@ -108,6 +131,7 @@ public class ClutchHandler {
     private void reset() {
         isActiveAndFalling = false;
         hasTriggered = false;
+        attemptingPlacement = false;
         targetDistanceBlocks = -1;
     }
 
@@ -160,8 +184,8 @@ public class ClutchHandler {
      * @param client The Minecraft client instance.
      * @param player The player performing the action.
      */
-    private void placeWaterBucket(Minecraft client, LocalPlayer player) {
-        if (client.gameMode == null) return;
+    private boolean placeWaterBucket(Minecraft client, LocalPlayer player, Level level) {
+        if (client.gameMode == null) return false;
 
         // Determine which hand is holding the water bucket
         InteractionHand hand = InteractionHand.MAIN_HAND;
@@ -174,6 +198,18 @@ public class ClutchHandler {
 
         // Use the item in the identified hand
         client.gameMode.useItem(player, hand);
+
+        // Success when the bucket is consumed or water already exists at/under the player
+        boolean bucketConsumed = !player.getItemInHand(hand).is(Items.WATER_BUCKET);
+        boolean waterPlaced = isWaterNearby(player, level);
+
+        return bucketConsumed || waterPlaced;
+    }
+
+    private boolean isWaterNearby(LocalPlayer player, Level level) {
+        BlockPos feet = player.blockPosition();
+        return level.getFluidState(feet).is(FluidTags.WATER)
+                || level.getFluidState(feet.below()).is(FluidTags.WATER);
     }
 
 
