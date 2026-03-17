@@ -26,14 +26,20 @@ import java.util.Random;
 public class ClutchHandler {
     /** Random instance for sampling trigger distances. */
     private static final Random random = new Random();
+
     /** True if the player is currently falling and clutch logic is active. */
-    private boolean isFalling = false;
+    private boolean isActiveAndFalling = false;
+
     /** True if the clutch action has already been triggered during this fall. */
     private boolean hasTriggered = false;
+
     /** The target distance (in blocks) from the ground to trigger the clutch. */
     private double targetDistanceBlocks = -1;
 
+
     private final Logger logger = AutoClutch.LOGGER;
+
+
 
     /**
      * Called every client tick to update clutch logic.
@@ -54,7 +60,7 @@ public class ClutchHandler {
         }
 
         // Check if player is falling and will take damage
-        boolean willTakeDamage = player.fallDistance > 3.0f
+        boolean willTakeDamage = player.fallDistance > 3.0
                 && !player.onGround()
                 && Objects.requireNonNull(player.gameMode()).isSurvival();
 
@@ -65,8 +71,8 @@ public class ClutchHandler {
         }
 
         // Just started falling - initialize trigger distance
-        if (!isFalling) {
-            isFalling = true;
+        if (!isActiveAndFalling) {
+            isActiveAndFalling = true;
             hasTriggered = false;
             targetDistanceBlocks = sampleTruncatedNormal(
                     AutoClutchConfig.getInstance().meanBlocks,
@@ -100,7 +106,7 @@ public class ClutchHandler {
      * Resets the clutch handler state for a new fall or when clutching is not needed.
      */
     private void reset() {
-        isFalling = false;
+        isActiveAndFalling = false;
         hasTriggered = false;
         targetDistanceBlocks = -1;
     }

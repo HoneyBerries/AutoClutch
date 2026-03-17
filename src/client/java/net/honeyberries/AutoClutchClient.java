@@ -5,10 +5,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.honeyberries.clutch.ClutchHandler;
 import net.honeyberries.config.AutoClutchConfig;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.KeyMapping.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -54,7 +56,11 @@ public class AutoClutchClient implements ClientModInitializer {
                 // Show a message to the player when toggling
                 if (client.player != null) {
                     String key = newState ? "text.autoclutch.enabled" : "text.autoclutch.disabled";
-                    client.player.displayClientMessage(Component.translatable(key), true);
+                    // Use a colored translatable component for the action bar message
+                    Component message = Component.translatable(key).withStyle(style ->
+                        style.withColor(newState ? ChatFormatting.GREEN: ChatFormatting.RED) // Green when enabled, red when disabled
+                    );
+                    client.player.displayClientMessage(message, true);
                 }
             }
         });
