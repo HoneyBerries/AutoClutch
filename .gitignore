@@ -25,3 +25,6 @@ replay_pid*
 
 # minecraft fabric folder
 run/
+
+.gradle/
+build
