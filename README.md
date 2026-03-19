@@ -121,10 +121,10 @@ This mod is designed to be undetectable by anticheats:
 
 ### Algorithm
 
-1. Detect falling (Y velocity < -0.5, not on ground)
+1. Detect falling (fall distance > 3.0, not on ground)
 2. On fall start, sample a target distance from truncated normal distribution
 3. Each tick, raycast downward to measure distance to ground
-4. When distance ≤ target distance, call `gameMode.useItem()`
+4. When distance ≤ target distance, use the item.
 5. Reset state when landing or fall ends
 
 ## Building from Source
@@ -139,14 +139,6 @@ Requirements:
 
 The built JAR will be in `build/libs/`.
 
-## License
-
-CC0-1.0 (Public Domain)
-
-## Credits
-
-Created for Fabric 1.21.11
-Uses Fabric API for keybindings and client events
 
 ## Support
 
