@@ -59,6 +59,10 @@ public class ClutchHandler {
             return;
         }
 
+        // Calculate eye-level distance to ground
+        double distanceToGround = getEyeDistanceToGround(player, client.level);
+        logger.info("Eye distance to ground: {}", distanceToGround);
+
         // Check if player is falling and will take damage
         boolean willTakeDamage = player.fallDistance > 3.0
                 && !player.onGround()
@@ -76,9 +80,7 @@ public class ClutchHandler {
             hasTriggered = false;
             targetDistanceBlocks = sampleTruncatedNormal(
                     AutoClutchConfig.getInstance().meanBlocks,
-                    AutoClutchConfig.getInstance().varianceBlocks,
-                    AutoClutchConfig.MIN_BLOCKS,
-                    AutoClutchConfig.MAX_BLOCKS
+                    AutoClutchConfig.getInstance().varianceBlocks
             );
         }
 
@@ -92,8 +94,6 @@ public class ClutchHandler {
             return;
         }
 
-        // Calculate distance to ground
-        double distanceToGround = getDistanceToGround(player, client.level);
 
         // Trigger water bucket placement when we reach target distance
         if (distanceToGround > 0 && distanceToGround <= targetDistanceBlocks) {
@@ -125,18 +125,18 @@ public class ClutchHandler {
     }
 
     /**
-     * Calculates the vertical distance from the player to the nearest solid ground below.
+     * Calculates the vertical distance from the player's eyes to the nearest solid ground below.
      *
      * @param player The player whose position to check.
      * @param level  The world level.
-     * @return The distance in blocks to the ground, or -1 if no ground found within 100 blocks.
+     * @return The distance in blocks from the player's eyes to the ground, or -1 if no ground found within 128 blocks.
      */
-    private double getDistanceToGround(LocalPlayer player, Level level) {
+    private double getEyeDistanceToGround(LocalPlayer player, Level level) {
         Vec3 playerPos = player.position();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-        // Start from player position and raycast downward
-        double startY = playerPos.y;
+        // Start from the player's eye position and scan downward
+        double startY = player.getEyeY();
 
         // Check up to 128 blocks down
         for (int i = 0; i < 128; i++) {
@@ -146,11 +146,11 @@ public class ClutchHandler {
             // Found a solid block
             if (!state.isAir() && state.isCollisionShapeFullBlock(level, pos)) {
                 double groundY = pos.getY() + 1.0; // Top of the block
-                return playerPos.y - groundY;
+                return startY - groundY;
             }
         }
 
-        // No ground found within 100 blocks
+        // No ground found within 128 blocks
         return -1;
     }
 
@@ -183,11 +183,9 @@ public class ClutchHandler {
      *
      * @param mean Mean of the distribution (in blocks)
      * @param stddev Standard deviation (in blocks)
-     * @param min Minimum value (1.5 blocks)
-     * @param max Maximum value (4.5 blocks)
      * @return A sampled value within bounds
      */
-    private double sampleTruncatedNormal(double mean, double stddev, double min, double max) {
+    private double sampleTruncatedNormal(double mean, double stddev) {
         double sample;
         int attempts = 0;
         final int maxAttempts = 16; // Safety limit
@@ -198,10 +196,10 @@ public class ClutchHandler {
 
             // Safety: if we can't find a valid sample, just use the mean
             if (attempts > maxAttempts) {
-                sample = Math.max(min, Math.min(max, mean));
+                sample = Math.max(AutoClutchConfig.MIN_BLOCKS, Math.min(AutoClutchConfig.MAX_BLOCKS, mean));
                 break;
             }
-        } while (sample < min || sample > max);
+        } while (sample < AutoClutchConfig.MIN_BLOCKS || sample > AutoClutchConfig.MAX_BLOCKS);
 
         logger.info("Sample {} from truncated normal distribution with mean {} and standard deviation {}", sample, mean, stddev);
 

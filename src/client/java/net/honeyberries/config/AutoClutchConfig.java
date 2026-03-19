@@ -15,16 +15,16 @@ public class AutoClutchConfig {
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("autoclutch.json");
     private static AutoClutchConfig INSTANCE = new AutoClutchConfig();
 
-    public static final double DEFAULT_MEAN_BLOCKS = 2.5;
-    public static final double DEFAULT_VARIANCE_BLOCKS = 1.2;
+    public static final double DEFAULT_MEAN_BLOCKS = 4.2;
+    public static final double DEFAULT_VARIANCE_BLOCKS = 0.7;
 
     public boolean enabled = true;
     public double meanBlocks = DEFAULT_MEAN_BLOCKS;
     public double varianceBlocks = DEFAULT_VARIANCE_BLOCKS;
 
     // Derived bounds - not serialized
-    public static final double MIN_BLOCKS = 1.5;
-    public static final double MAX_BLOCKS = 4.0;
+    public static final double MIN_BLOCKS = 0.1;
+    public static final double MAX_BLOCKS = 4.5;
     public static final double MIN_VARIANCE_BLOCKS = 0.0;
     public static final double MAX_VARIANCE_BLOCKS = 2.0;
 
