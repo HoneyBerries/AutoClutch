@@ -61,7 +61,7 @@ public class ClutchHandler {
 
         // Calculate eye-level distance to ground
         double distanceToGround = getEyeDistanceToGround(player, client.level);
-        logger.info("Eye distance to ground: {}", distanceToGround);
+        //logger.info("Eye distance to ground: {}", distanceToGround);
 
         // Check if player is falling and will take damage
         boolean willTakeDamage = player.fallDistance > 3.0
