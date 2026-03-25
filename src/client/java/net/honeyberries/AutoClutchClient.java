@@ -48,7 +48,7 @@ public class AutoClutchClient implements ClientModInitializer {
         );
 
         // Register a tick event to run clutch logic and handle keybinds
-        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
             clutchHandler.tick(client);
 
             // Handle toggle keybind presses
