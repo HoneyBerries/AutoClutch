@@ -1,6 +1,6 @@
 {
-  "key.categories.autoclutch": "AutoClutch",
-  "key.autoclutch.toggle": "Toggle AutoClutch",
+  "key.category.autoclutch.keybinds": "AutoClutch Keybinds",
+  "key.autoclutch.togglekeybind": "Toggle AutoClutch",
 
   "config.autoclutch.title": "AutoClutch Config",
   "config.autoclutch.category.general": "General Settings",
@@ -10,13 +10,17 @@
   "config.autoclutch.group.general.description": "Basic mod settings",
 
   "config.autoclutch.enabled": "Enable AutoClutch",
-  "config.autoclutch.enabled.description": "Toggle the mod on/off. When disabled, water bucket clutching will not be automated.",
+  "config.autoclutch.enabled.description": "Toggle the mod on/off. When disabled, clutching will not be automated.",
+
+  "config.autoclutch.enable_water": "Enable Water Bucket",
+  "config.autoclutch.enable_water.description": "Allow clutching with water buckets",
+
 
   "config.autoclutch.group.timing": "Timing Settings",
-  "config.autoclutch.group.timing.description": "Configure when the water bucket is placed during a fall. Higher mean = earlier placement, higher variance = more variation in timing.",
+  "config.autoclutch.group.timing.description": "Configure when the clutch material is placed during a fall. Higher mean = earlier placement, higher variance = more variation in timing.",
 
   "config.autoclutch.mean": "Mean Distance",
-  "config.autoclutch.mean.description": "Average distance in blocks above ground when water is placed. Range: 1.5-4.0 blocks. Recommended: 2.5 blocks.",
+  "config.autoclutch.mean.description": "Average distance in blocks above ground when clutch material is placed. Range: 1.5-4.0 blocks. Recommended: 2.5 blocks.",
 
   "config.autoclutch.variance": "Variance",
   "config.autoclutch.variance.description": "How much the timing varies, in blocks (standard deviation). Higher = more human-like variation. Safe range: 0.5-2.0 blocks. Recommended: 1.2 blocks.",

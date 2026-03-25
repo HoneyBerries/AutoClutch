@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Objects;
@@ -61,7 +62,7 @@ public class ClutchHandler {
 
         // Calculate eye-level distance to ground
         double distanceToGround = getEyeDistanceToGround(player, client.level);
-        //logger.info("Eye distance to ground: {}", distanceToGround);
+        logger.debug("Eye distance to ground: {}", distanceToGround);
 
         // Check if player is falling and will take damage
         boolean willTakeDamage = player.fallDistance > 3.0
@@ -89,15 +90,15 @@ public class ClutchHandler {
             return;
         }
 
-        // Check if player is holding a water bucket
-        if (!isHoldingWaterBucket(player)) {
+        // Check if player is holding a water bucket or powdered snow
+        if (!isHoldingClutchMaterial(player)) {
             return;
         }
 
 
         // Trigger water bucket placement when we reach target distance
         if (distanceToGround > 0 && distanceToGround <= targetDistanceBlocks) {
-            placeWaterBucket(client, player);
+            placeItem(client, player);
             hasTriggered = true;
         }
     }
@@ -112,16 +113,40 @@ public class ClutchHandler {
     }
 
     /**
-     * Checks if the player is holding a water bucket in either hand.
+     * Checks if the player is holding a water bucket in either hand, and water is enabled in config.
      *
      * @param player The player to check.
-     * @return True if the player is holding a water bucket.
+     * @return True if the player is holding a water bucket and it's enabled.
      */
-    private boolean isHoldingWaterBucket(LocalPlayer player) {
+    private boolean isHoldingClutchMaterial(LocalPlayer player) {
+        if (!AutoClutchConfig.getInstance().enableWater) {
+            return false;
+        }
+
         ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
 
         return mainHand.is(Items.WATER_BUCKET) || offHand.is(Items.WATER_BUCKET);
+    }
+
+    /**
+     * Gets the interaction hand that is holding the water bucket.
+     *
+     * @param player The player to check.
+     * @return The hand holding the water bucket, or null if not found.
+     */
+    @Nullable
+    private InteractionHand getClutchMaterialHand(LocalPlayer player) {
+        ItemStack mainHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+        ItemStack offHand = player.getItemInHand(InteractionHand.OFF_HAND);
+
+        if (mainHand.is(Items.WATER_BUCKET)) {
+            return InteractionHand.MAIN_HAND;
+        } else if (offHand.is(Items.WATER_BUCKET)) {
+            return InteractionHand.OFF_HAND;
+        }
+
+        return null;
     }
 
     /**
@@ -160,19 +185,18 @@ public class ClutchHandler {
      * @param client The Minecraft client instance.
      * @param player The player performing the action.
      */
-    private void placeWaterBucket(Minecraft client, LocalPlayer player) {
+    private void placeItem(Minecraft client, LocalPlayer player) {
         if (client.gameMode == null) return;
 
         // Determine which hand is holding the water bucket
-        InteractionHand hand = InteractionHand.MAIN_HAND;
+        InteractionHand hand = getClutchMaterialHand(player);
 
-        // Check if main hand is NOT a water bucket.
-        // If it's not, we check if the off-hand IS a water bucket.
-        if (!player.getItemInHand(InteractionHand.MAIN_HAND).is(Items.WATER_BUCKET)) {
-            hand = InteractionHand.OFF_HAND;
+        if (hand == null) {
+            logger.error("Failed to determine clutch material hand");
+            return;
         }
 
-        // Use the item in the identified hand
+        logger.info("Placing water bucket for clutch");
         client.gameMode.useItem(player, hand);
     }
 

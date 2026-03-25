@@ -44,7 +44,7 @@ public class AutoClutchModMenuIntegration implements ModMenuApi {
                 // Add the main config category
                 .category(ConfigCategory.createBuilder()
                         .name(Component.translatable("config.autoclutch.category.general"))
-                        // General group: enable/disable toggle
+                        // General group: enable/disable toggle and material selection
                         .group(OptionGroup.createBuilder()
                                 .name(Component.translatable("config.autoclutch.group.general"))
                                 .description(OptionDescription.of(Component.translatable("config.autoclutch.group.general.description")))
@@ -53,6 +53,12 @@ public class AutoClutchModMenuIntegration implements ModMenuApi {
                                         .description(OptionDescription.of(Component.translatable("config.autoclutch.enabled.description")))
                                         // Bind to config value
                                         .binding(true, () -> AutoClutchConfig.getInstance().enabled, value -> AutoClutchConfig.getInstance().enabled = value)
+                                        .controller(BooleanControllerBuilder::create)
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.translatable("config.autoclutch.enable_water"))
+                                        .description(OptionDescription.of(Component.translatable("config.autoclutch.enable_water.description")))
+                                        .binding(true, () -> AutoClutchConfig.getInstance().enableWater, value -> AutoClutchConfig.getInstance().enableWater = value)
                                         .controller(BooleanControllerBuilder::create)
                                         .build())
                                 .build())

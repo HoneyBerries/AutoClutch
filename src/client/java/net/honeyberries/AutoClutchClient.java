@@ -11,6 +11,7 @@ import net.minecraft.client.KeyMapping.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -34,17 +35,20 @@ public class AutoClutchClient implements ClientModInitializer {
         // Load configuration from disk
         AutoClutchConfig.load();
 
-        // Register the keybinding for toggling the mod
-        toggleKey = new KeyMapping(
-                "key.autoclutch.toggle",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_B,
-                Category.MISC
+        KeyMapping.Category AUTOCLUTCH_CATEGORY = KeyMapping.Category.register(
+            Identifier.fromNamespaceAndPath(AutoClutch.MOD_ID, "keybinds")
         );
-        KeyBindingHelper.registerKeyBinding(toggleKey);
+
+        // Register the keybinding for toggling the mod
+        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.autoclutch.togglekeybind",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_DONT_CARE,
+                AUTOCLUTCH_CATEGORY)
+        );
 
         // Register a tick event to run clutch logic and handle keybinds
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
             clutchHandler.tick(client);
 
             // Handle toggle keybind presses

@@ -21,6 +21,7 @@ public class AutoClutchConfig {
     public boolean enabled = true;
     public double meanBlocks = DEFAULT_MEAN_BLOCKS;
     public double varianceBlocks = DEFAULT_VARIANCE_BLOCKS;
+    public boolean enableWater = true;
 
     // Derived bounds - not serialized
     public static final double MIN_BLOCKS = 0.1;
