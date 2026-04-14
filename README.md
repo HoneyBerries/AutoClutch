@@ -57,34 +57,6 @@ The mod creates a configuration file at `config/autoclutch.json` with the follow
   - Lower values = more consistent timing
   - Higher values = more human-like variation
 
-### Recommended Settings by Skill Level:
-
-**Beginner** (safe, early placement):
-```json
-{
-  "enabled": true,
-  "meanBlocks": 3.5,
-  "varianceBlocks": 2.0
-}
-```
-
-**Average** (balanced):
-```json
-{
-  "enabled": true,
-  "meanBlocks": 2.5,
-  "varianceBlocks": 1.2
-}
-```
-
-**Skilled** (optimal, consistent):
-```json
-{
-  "enabled": true,
-  "meanBlocks": 2.0,
-  "varianceBlocks": 0.8
-}
-```
 
 ## Keybinds
 
