@@ -7,7 +7,7 @@ Automatic water bucket clutching for Fabric 1.21.11 with human-like timing!
 - **Human-Like Timing**: Uses truncated normal distribution for realistic, varied timing
 - **Anticheat Safe**: Uses vanilla Minecraft interaction system - indistinguishable from manual clicks
 - **Configurable**: Adjust mean distance, variance, and enable/disable the mod
-- **Toggle Keybind**: Press 'B' (configurable) to toggle the mod on/off in-game
+- **Toggle Keybind**: Press a configurable keybind (defualt set to nothing) to toggle the mod on/off in-game
 
 ## How It Works
 
@@ -58,18 +58,11 @@ The mod creates a configuration file at `config/autoclutch.json` with the follow
   - Higher values = more human-like variation
 
 
-## Keybinds
-
-- **Toggle AutoClutch**: `B` (configurable in Minecraft's controls menu under "Miscellaneous")
-
-When toggled, the mod displays a message in the action bar showing whether it's enabled or disabled.
-
 ## Usage
 
 1. Make sure you have a water bucket in your main hand or offhand
 2. Fall from a height
 3. The mod will automatically place the water bucket when you reach the configured distance from the ground
-4. Press 'B' to toggle the mod on/off at any time
 
 ## Technical Details
 
