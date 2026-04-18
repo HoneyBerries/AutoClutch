@@ -9,7 +9,7 @@
 	],
 	"contact": {
 		"homepage": "https://honeyberries.net",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/HoneyBerries/AutoClutch"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/autoclutch/icon.png",
