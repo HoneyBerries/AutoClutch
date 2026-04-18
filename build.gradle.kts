@@ -1,14 +1,10 @@
 plugins {
-	id("net.fabricmc.fabric-loom-remap")
+	id("net.fabricmc.fabric-loom")
 	`maven-publish`
 }
 
 version = providers.gradleProperty("mod_version").get()
 group = providers.gradleProperty("maven_group").get()
-
-base {
-	archivesName = providers.gradleProperty("archives_base_name")
-}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -16,17 +12,13 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-	maven {
-		name = "TerraformersMC"
-		url = uri("https://maven.terraformersmc.com/releases/")
+
+	maven("https://maven.terraformersmc.com/") {
+		name = "Terraformers"
 	}
-	maven {
-		name = "Modrinth"
-		url = uri("https://api.modrinth.com/maven")
-	}
-	maven {
-		name = "Isxander"
-		url = uri("https://maven.isxander.dev/releases")
+
+	maven("https://maven.isxander.dev/releases") {
+		name = "Xander Maven"
 	}
 }
 
@@ -42,19 +34,17 @@ loom {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
+// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
-	mappings(loom.officialMojangMappings())
-	modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
+
+	implementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
+	implementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 
-	// Optional config UI integrations (ModMenu + YACL)
-	modCompileOnly("com.terraformersmc:modmenu:${providers.gradleProperty("modmenu_version").get()}")
-	modLocalRuntime("com.terraformersmc:modmenu:${providers.gradleProperty("modmenu_version").get()}")
-	modCompileOnly("dev.isxander:yet-another-config-lib:${providers.gradleProperty("yacl_version").get()}")
-	modLocalRuntime("dev.isxander:yet-another-config-lib:${providers.gradleProperty("yacl_version").get()}")
+	// Mod dependencies
+	implementation("com.terraformersmc:modmenu:${providers.gradleProperty("modmenu_version").get()}")
+	implementation("dev.isxander:yet-another-config-lib:${providers.gradleProperty("yacl_version").get()}")
 }
 
 tasks.processResources {
@@ -66,7 +56,7 @@ tasks.processResources {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-	options.release = 21
+	options.release = 25
 }
 
 java {
@@ -75,15 +65,15 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 tasks.jar {
-	inputs.property("archivesName", base.archivesName)
+	inputs.property("projectName", project.name)
 
 	from("LICENSE") {
-		rename { "${it}_${base.archivesName.get()}" }
+		rename { "${it}_${project.name}" }
 	}
 }
 
@@ -91,7 +81,6 @@ tasks.jar {
 publishing {
 	publications {
 		register<MavenPublication>("mavenJava") {
-			artifactId = base.archivesName.get()
 			from(components["java"])
 		}
 	}

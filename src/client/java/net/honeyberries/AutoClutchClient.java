@@ -2,15 +2,12 @@ package net.honeyberries;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.honeyberries.clutch.ClutchHandler;
 import net.honeyberries.config.AutoClutchConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.KeyMapping.Category;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -39,13 +36,12 @@ public class AutoClutchClient implements ClientModInitializer {
             Identifier.fromNamespaceAndPath(AutoClutch.MOD_ID, "keybinds")
         );
 
-        // Register the keybinding for toggling the mod
-        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        KeyMapping toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.autoclutch.togglekeybind",
                 InputConstants.Type.KEYSYM,
-                GLFW.GLFW_DONT_CARE,
-                AUTOCLUTCH_CATEGORY)
-        );
+                GLFW.GLFW_KEY_B,
+                AUTOCLUTCH_CATEGORY));
+
 
         // Register a tick event to run clutch logic and handle keybinds
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -64,7 +60,7 @@ public class AutoClutchClient implements ClientModInitializer {
                     Component message = Component.translatable(key).withStyle(style ->
                         style.withColor(newState ? ChatFormatting.GREEN: ChatFormatting.RED) // Green when enabled, red when disabled
                     );
-                    client.player.displayClientMessage(message, true);
+                    client.player.sendOverlayMessage(message);
                 }
             }
         });

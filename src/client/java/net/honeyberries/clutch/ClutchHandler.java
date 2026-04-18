@@ -220,7 +220,7 @@ public class ClutchHandler {
 
             // Safety: if we can't find a valid sample, just use the mean
             if (attempts > maxAttempts) {
-                sample = Math.max(AutoClutchConfig.MIN_BLOCKS, Math.min(AutoClutchConfig.MAX_BLOCKS, mean));
+                sample = Math.clamp(mean, AutoClutchConfig.MIN_BLOCKS, AutoClutchConfig.MAX_BLOCKS);
                 break;
             }
         } while (sample < AutoClutchConfig.MIN_BLOCKS || sample > AutoClutchConfig.MAX_BLOCKS);

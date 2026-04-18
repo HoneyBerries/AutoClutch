@@ -13,6 +13,7 @@ import java.nio.file.Path;
 public class AutoClutchConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("autoclutch.json");
+
     private static AutoClutchConfig INSTANCE = new AutoClutchConfig();
 
     public static final double DEFAULT_MEAN_BLOCKS = 4.2;
@@ -26,6 +27,7 @@ public class AutoClutchConfig {
     // Derived bounds - not serialized
     public static final double MIN_BLOCKS = 0.1;
     public static final double MAX_BLOCKS = 4.5;
+
     public static final double MIN_VARIANCE_BLOCKS = 0.0;
     public static final double MAX_VARIANCE_BLOCKS = 2.0;
 
@@ -49,6 +51,7 @@ public class AutoClutchConfig {
         }
     }
 
+
     public static void save() {
         try {
             INSTANCE.sanitize();
@@ -62,11 +65,8 @@ public class AutoClutchConfig {
     }
 
     public void sanitize() {
-        meanBlocks = clamp(meanBlocks, MIN_BLOCKS, MAX_BLOCKS);
-        varianceBlocks = clamp(varianceBlocks, MIN_VARIANCE_BLOCKS, MAX_VARIANCE_BLOCKS);
+        meanBlocks = Math.clamp(meanBlocks, MIN_BLOCKS, MAX_BLOCKS);
+        varianceBlocks = Math.clamp(varianceBlocks, MIN_VARIANCE_BLOCKS, MAX_VARIANCE_BLOCKS);
     }
 
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
-    }
 }
