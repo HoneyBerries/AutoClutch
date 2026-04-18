@@ -8,7 +8,7 @@
 		"HoneyBerries"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
+		"homepage": "https://honeyberries.net",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
@@ -39,5 +39,15 @@
 		"fabric-api": "*",
 		"modmenu": "*",
 		"yet_another_config_lib_v3": "*"
+	},
+
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/TbkHCshxjS"
+			},
+			"update_checker": true
+		}
 	}
+
 }
