@@ -1,0 +1,54 @@
+name: Create Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew assemble
+
+      - name: Extract version from gradle.properties
+        id: version
+        run: |
+          VERSION=$(grep 'project_version=' gradle.properties | cut -d'=' -f2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Check if release exists
+        id: check_release
+        continue-on-error: true
+        run: |
+          gh release view v${{ steps.version.outputs.version }} > /dev/null 2>&1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        if: steps.check_release.outcome == 'failure'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          artifacts: 'build/libs/*-all.jar'
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
