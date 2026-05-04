@@ -25,7 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew assemble
+        run: ./gradlew build
 
       - name: Extract version from gradle.properties
         id: version
@@ -48,7 +48,7 @@ jobs:
         with:
           tag: v${{ steps.version.outputs.version }}
           name: Release ${{ steps.version.outputs.version }}
-          artifacts: 'build/libs/*-all.jar'
+          artifacts: 'build/libs/[^-]*.jar'
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
