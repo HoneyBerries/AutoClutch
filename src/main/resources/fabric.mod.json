@@ -22,7 +22,7 @@
 			"net.honeyberries.AutoClutchClient"
 		],
 		"modmenu": [
-			"net.honeyberries.config.AutoClutchModMenuIntegration"
+          "net.honeyberries.config.AutoClutchModMenu"
 		]
 	},
 	"mixins": [

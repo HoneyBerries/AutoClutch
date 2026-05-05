@@ -1,0 +1,63 @@
+name: Publish to Modrinth
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Extract version info from gradle.properties
+        id: version_info
+        run: |
+          MOD_VERSION=$(grep 'mod_version=' gradle.properties | cut -d'=' -f2)
+          MINECRAFT_VERSION=$(grep 'minecraft_version=' gradle.properties | cut -d'=' -f2)
+
+          echo "mod_version=$MOD_VERSION" >> $GITHUB_OUTPUT
+          echo "minecraft_version=$MINECRAFT_VERSION" >> $GITHUB_OUTPUT
+
+          # Determine release type based on version string
+          if [[ $MOD_VERSION == *"alpha"* ]]; then
+            RELEASE_TYPE="alpha"
+          elif [[ $MOD_VERSION == *"beta"* ]]; then
+            RELEASE_TYPE="beta"
+          else
+            RELEASE_TYPE="release"
+          fi
+
+          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          echo "Mod version: $MOD_VERSION, MC version: $MINECRAFT_VERSION, Release type: $RELEASE_TYPE"
+
+      - name: Publish to Modrinth
+        uses: Kir-Antipov/mc-publish@v3
+        with:
+          modrinth-id: RIZyD6HA
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          name: AutoClutch ${{ steps.version_info.outputs.mod_version }}
+          version: ${{ steps.version_info.outputs.mod_version }}
+
+          files: build/libs/!(*-sources).jar
+
+          game-versions: ${{ steps.version_info.outputs.minecraft_version }}
+          loaders: fabric
+
+          changelog: Release ${{ steps.version_info.outputs.mod_version }}
+          version-type: ${{ steps.version_info.outputs.release_type }}

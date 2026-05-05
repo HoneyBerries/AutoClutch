@@ -20,7 +20,7 @@ import java.util.Locale;
  * Provides a YACL-powered config screen with safe sliders for mean and variance,
  * and a toggle for enabling/disabling the mod. All values are clamped to safe ranges.
  */
-public class AutoClutchModMenuIntegration implements ModMenuApi {
+public class AutoClutchModMenu implements ModMenuApi {
     /**
      * Returns a factory for the AutoClutch config screen, as required by ModMenu.
      * The screen is built using YACL and reflects/saves values to AutoClutchConfig.

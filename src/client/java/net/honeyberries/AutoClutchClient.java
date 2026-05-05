@@ -18,8 +18,6 @@ import com.mojang.blaze3d.platform.InputConstants;
  * Handles keybinding registration, tick event registration, and toggling the mod on/off.
  */
 public class AutoClutchClient implements ClientModInitializer {
-    /** Keybinding for toggling AutoClutch on/off. */
-    private static KeyMapping toggleKey;
     /** Handles the clutch logic each tick. */
     private static final ClutchHandler clutchHandler = new ClutchHandler();
 
