@@ -1,13 +1,20 @@
 # AutoClutch
-Automatic water bucket clutching for Fabric 1.21.11 with human-like timing!
+
+[![Latest Release](https://img.shields.io/github/v/release/HoneyBerries/AutoClutch?style=flat-square&color=brightgreen)](https://github.com/HoneyBerries/AutoClutch/releases)
+[![License](https://img.shields.io/github/license/HoneyBerries/AutoClutch?style=flat-square)](LICENSE)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.26.1+-blue?style=flat-square)](https://www.minecraft.net/)
+[![Fabric API](https://img.shields.io/badge/Fabric%20API-0.148.0+-blue?style=flat-square)](https://modrinth.com/mod/fabric-api)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/HoneyBerries/AutoClutch/build.yml?style=flat-square)](https://github.com/HoneyBerries/AutoClutch/actions)
+
+Automatic water bucket clutching for Fabric with human-like timing!
 
 ## Features
 
 - **Automatic Water Bucket Clutching**: Automatically places water buckets when falling to prevent death
 - **Human-Like Timing**: Uses truncated normal distribution for realistic, varied timing
-- **Anticheat Safe**: Uses vanilla Minecraft interaction system - indistinguishable from manual clicks
+- **Anticheat Safe**: Uses vanilla Minecraft interaction system—indistinguishable from manual clicks
 - **Configurable**: Adjust mean distance, variance, and enable/disable the mod
-- **Toggle Keybind**: Press a configurable keybind (defualt set to nothing) to toggle the mod on/off in-game
+- **Toggle Keybind**: Press the 'B' key to toggle the mod on/off in-game
 
 ## How It Works
 
@@ -21,15 +28,15 @@ The mod detects when you're falling and automatically places a water bucket at t
 
 ## Installation
 
-1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.21.11
-2. Install [Fabric API](https://modrinth.com/mod/fabric-api) 0.141.3+1.21.11 or later
-3. Download AutoClutch JAR from releases
+1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.26.1
+2. Install [Fabric API](https://modrinth.com/mod/fabric-api) 0.148.0+ or later
+3. Download AutoClutch JAR from [GitHub Releases](https://github.com/HoneyBerries/AutoClutch/releases)
 4. Place the JAR file in your `.minecraft/mods` folder
 5. Launch Minecraft with Fabric
 
 ## Configuration
 
-The mod creates a configuration file at `config/autoclutch.json` with the following settings:
+The mod creates a configuration file at `config/autoclutch.json` with the following default settings:
 
 ```json
 {
@@ -39,73 +46,63 @@ The mod creates a configuration file at `config/autoclutch.json` with the follow
 }
 ```
 
-### Configuration Options:
+### Configuration Options
 
-- **enabled** (boolean): Enable or disable the mod
-  - Default: `true`
-  - Can also be toggled with the 'B' key in-game
-
-- **meanBlocks** (double): Average distance above ground (in blocks) when water is placed
-  - Range: 1.5 - 4.5 blocks
-  - Default: `2.5`
-  - Lower values = later placement (riskier but looks more skilled)
-  - Higher values = earlier placement (safer but less optimal)
-
-- **varianceBlocks** (double): Standard deviation of placement timing (in blocks)
-  - Range: 0.5 - 2.5 blocks
-  - Default: `1.2`
-  - Lower values = more consistent timing
-  - Higher values = more human-like variation
+| Option | Type | Range | Default | Description |
+|--------|------|-------|---------|-------------|
+| `enabled` | boolean | — | `true` | Enable or disable the mod. Can also be toggled with the 'B' key in-game |
+| `meanBlocks` | double | 1.5—4.5 | `2.5` | Average distance above ground (in blocks) when water is placed. Lower = riskier; Higher = safer |
+| `varianceBlocks` | double | 0.5—2.5 | `1.2` | Standard deviation of placement timing. Lower = consistent; Higher = human-like variation |
 
 
 ## Usage
 
-1. Make sure you have a water bucket in your main hand or offhand
+1. Ensure you have a water bucket in your main hand or offhand
 2. Fall from a height
-3. The mod will automatically place the water bucket when you reach the configured distance from the ground
+3. The mod will automatically place the water bucket at the configured distance from the ground
 
 ## Technical Details
 
-### How the Timing Works
+### Timing Algorithm
 
-The mod uses a **truncated normal distribution** bounded between 1.5 and 4.5 blocks:
-- **1.5 blocks minimum**: Any later and you'll take damage or die
-- **4.5 blocks maximum**: Any earlier and the water may despawn before you land
+The mod uses a **truncated normal distribution** bounded between 1.5 and 4.5 blocks to determine when to place the water bucket:
 
-The distribution naturally clusters around your configured mean, with the tails cut off at the safety bounds. This creates realistic human-like variation while guaranteeing clutches within the safe window.
+- **1.5 blocks minimum**: Safety threshold—any later risks taking damage
+- **4.5 blocks maximum**: Optimal threshold—ensures water is placed before despawning
+- **Distribution**: Clusters around your configured mean with natural human-like variation
 
-### Anticheat Considerations
-
-This mod is designed to be undetectable by anticheats:
-
-1. **Packet-identical to manual clicks**: Uses `MultiPlayerGameMode.useItem()` which sends the exact same `ServerboundUseItemPacket` as a real right-click
-2. **No inhuman precision**: Random timing variance prevents pixel-perfect consistency
-3. **Inventory checking**: Only activates when you're actually holding a water bucket
-4. **No position manipulation**: The mod never touches your player position
-5. **Natural variation**: Configurable mean and variance allow you to tune "skill level"
-
-### Algorithm
-
+The algorithm flow:
 1. Detect falling (fall distance > 3.0, not on ground)
-2. On fall start, sample a target distance from truncated normal distribution
+2. Sample a target distance from the truncated normal distribution
 3. Each tick, raycast downward to measure distance to ground
-4. When distance ≤ target distance, use the item.
+4. When distance ≤ target distance, place the water bucket
 5. Reset state when landing or fall ends
+
+### Anticheat Safety
+
+This mod is designed to be indistinguishable from manual water bucket clutching:
+
+- **Packet-identical**: Uses `MultiPlayerGameMode.useItem()`, sending the exact same `ServerboundUseItemPacket` as a real right-click
+- **No position manipulation**: Never alters your player position or movement
+- **Inventory checking**: Only activates when holding a water bucket
+- **Human-like variance**: Random timing variance prevents pixel-perfect consistency
+- **Configurable skill level**: Adjust mean and variance to match your playstyle
 
 ## Building from Source
 
-Requirements:
-- JDK 21
+### Requirements
+- JDK 21+
 - Gradle 9.3+
+
+### Build Command
 
 ```bash
 ./gradlew build
 ```
 
-The built JAR will be in `build/libs/`.
+The compiled JAR will be located in `build/libs/`.
 
+## Contributing & Support
 
-## Support
-
-For issues, feature requests, or questions, please visit the [GitHub repository](https://github.com/HoneyBerries/AutoClutch).
+Found a bug or have a feature request? Visit the [GitHub Issues](https://github.com/HoneyBerries/AutoClutch/issues) page to report or discuss.
 
