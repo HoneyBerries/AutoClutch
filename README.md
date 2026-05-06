@@ -24,7 +24,7 @@ The mod detects when you're falling and automatically places a water bucket at t
 - **No packet manipulation**: Uses `gameMode.useItem()` which is identical to vanilla right-clicks
 - **No position teleportation**: Only automates timing, not movement
 - **Human-like variance**: Configurable randomness in placement timing
-- **Bounds checking**: Only triggers within the safe 1.5-4.5 block window
+- **Bounds checking**: Constrains placement timing within the 0.1-4.5 block window
 
 ## Installation
 
@@ -41,8 +41,9 @@ The mod creates a configuration file at `config/autoclutch.json` with the follow
 ```json
 {
   "enabled": true,
-  "meanBlocks": 2.5,
-  "varianceBlocks": 1.2
+  "meanBlocks": 4.2,
+  "varianceBlocks": 0.7,
+  "enableWater": true
 }
 ```
 
@@ -51,8 +52,9 @@ The mod creates a configuration file at `config/autoclutch.json` with the follow
 | Option | Type | Range | Default | Description |
 |--------|------|-------|---------|-------------|
 | `enabled` | boolean | — | `true` | Enable or disable the mod. Can also be toggled with the 'B' key in-game |
-| `meanBlocks` | double | 1.5—4.5 | `2.5` | Average distance above ground (in blocks) when water is placed. Lower = riskier; Higher = safer |
-| `varianceBlocks` | double | 0.5—2.5 | `1.2` | Standard deviation of placement timing. Lower = consistent; Higher = human-like variation |
+| `meanBlocks` | double | 0.1—4.5 | `4.2` | Average distance above ground (in blocks) when water is placed. Lower = riskier; Higher = safer |
+| `varianceBlocks` | double | 0.0—2.0 | `0.7` | Standard deviation of placement timing. Lower = consistent; Higher = human-like variation |
+| `enableWater` | boolean | — | `true` | Enable or disable automatic water bucket placement |
 
 
 ## Usage
@@ -65,11 +67,11 @@ The mod creates a configuration file at `config/autoclutch.json` with the follow
 
 ### Timing Algorithm
 
-The mod uses a **truncated normal distribution** bounded between 1.5 and 4.5 blocks to determine when to place the water bucket:
+The mod uses a **truncated normal distribution** bounded between 0.1 and 4.5 blocks to determine when to place the water bucket:
 
-- **1.5 blocks minimum**: Safety threshold—any later risks taking damage
-- **4.5 blocks maximum**: Optimal threshold—ensures water is placed before despawning
-- **Distribution**: Clusters around your configured mean with natural human-like variation
+- **0.1 blocks minimum**: Lower bound for early placement
+- **4.5 blocks maximum**: Upper bound for placement timing
+- **Distribution**: Clusters around your configured mean (default 4.2) with natural human-like variation based on variance (default 0.7)
 
 The algorithm flow:
 1. Detect falling (fall distance > 3.0, not on ground)
@@ -91,8 +93,8 @@ This mod is designed to be indistinguishable from manual water bucket clutching:
 ## Building from Source
 
 ### Requirements
-- JDK 21+
-- Gradle 9.3+
+- JDK 25+
+- Gradle (uses bundled Gradle wrapper v9.5.0)
 
 ### Build Command
 
