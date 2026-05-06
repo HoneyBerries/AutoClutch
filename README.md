@@ -2,7 +2,7 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/HoneyBerries/AutoClutch?style=flat-square&color=brightgreen)](https://github.com/HoneyBerries/AutoClutch/releases)
 [![License](https://img.shields.io/github/license/HoneyBerries/AutoClutch?style=flat-square)](LICENSE)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.26.1+-blue?style=flat-square)](https://www.minecraft.net/)
+[![Minecraft](https://img.shields.io/badge/Minecraft-26.1.2+-blue?style=flat-square)](https://www.minecraft.net/)
 [![Fabric API](https://img.shields.io/badge/Fabric%20API-0.148.0+-blue?style=flat-square)](https://modrinth.com/mod/fabric-api)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/HoneyBerries/AutoClutch/build.yml?style=flat-square)](https://github.com/HoneyBerries/AutoClutch/actions)
 
@@ -28,7 +28,7 @@ The mod detects when you're falling and automatically places a water bucket at t
 
 ## Installation
 
-1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 1.26.1
+1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 26.1.2
 2. Install [Fabric API](https://modrinth.com/mod/fabric-api) 0.148.0+ or later
 3. Download AutoClutch JAR from [GitHub Releases](https://github.com/HoneyBerries/AutoClutch/releases)
 4. Place the JAR file in your `.minecraft/mods` folder
