@@ -14,7 +14,7 @@ Automatic water bucket clutching for Fabric with human-like timing!
 - **Human-Like Timing**: Uses truncated normal distribution for realistic, varied timing
 - **Anticheat Safe**: Uses vanilla Minecraft interaction system—indistinguishable from manual clicks
 - **Configurable**: Adjust mean distance, variance, and enable/disable the mod
-- **Toggle Keybind**: Press the 'B' key to toggle the mod on/off in-game
+- **Toggle Keybind**: Press a configurable keybind to toggle the mod on/off in-game
 
 ## How It Works
 
