@@ -15,27 +15,22 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Objects;
-import java.util.Random;
 
 /**
  * Handles automatic water bucket clutching for the player.
  * <p>
  * This class detects when the player is falling and, if holding a water bucket, attempts to place water
- * at a configurable distance from the ground to prevent fall damage. The trigger distance is sampled
- * from a truncated normal distribution to simulate human-like reaction times.
+ * once the player is within Minecraft's default survival block reach distance of the ground.
  */
 public class ClutchHandler {
-    /** Random instance for sampling trigger distances. */
-    private static final Random random = new Random();
+    /** Minecraft's default survival block interaction (reach) range, in blocks. */
+    private static final double TRIGGER_DISTANCE_BLOCKS = 4.5;
 
     /** True if the player is currently falling and clutch logic is active. */
     private boolean isActiveAndFalling = false;
 
     /** True if the clutch action has already been triggered during this fall. */
     private boolean hasTriggered = false;
-
-    /** The target distance (in blocks) from the ground to trigger the clutch. */
-    private double targetDistanceBlocks = -1;
 
 
     private final Logger logger = AutoClutch.LOGGER;
@@ -75,14 +70,10 @@ public class ClutchHandler {
             return;
         }
 
-        // Just started falling - initialize trigger distance
+        // Just started falling - reset trigger state
         if (!isActiveAndFalling) {
             isActiveAndFalling = true;
             hasTriggered = false;
-            targetDistanceBlocks = sampleTruncatedNormal(
-                    AutoClutchConfig.getInstance().meanBlocks,
-                    AutoClutchConfig.getInstance().varianceBlocks
-            );
         }
 
         // Already triggered this fall
@@ -96,8 +87,8 @@ public class ClutchHandler {
         }
 
 
-        // Trigger water bucket placement when we reach target distance
-        if (distanceToGround > 0 && distanceToGround <= targetDistanceBlocks) {
+        // Trigger water bucket placement once within reach distance of the ground
+        if (distanceToGround > 0 && distanceToGround <= TRIGGER_DISTANCE_BLOCKS) {
             placeItem(client, player);
             hasTriggered = true;
         }
@@ -109,7 +100,6 @@ public class ClutchHandler {
     private void reset() {
         isActiveAndFalling = false;
         hasTriggered = false;
-        targetDistanceBlocks = -1;
     }
 
     /**
@@ -198,35 +188,5 @@ public class ClutchHandler {
 
         logger.info("Placing water bucket for clutch");
         client.gameMode.useItem(player, hand);
-    }
-
-
-    /**
-     * Sample from a truncated normal distribution.
-     * Uses rejection sampling to stay within bounds.
-     *
-     * @param mean Mean of the distribution (in blocks)
-     * @param stddev Standard deviation (in blocks)
-     * @return A sampled value within bounds
-     */
-    private double sampleTruncatedNormal(double mean, double stddev) {
-        double sample;
-        int attempts = 0;
-        final int maxAttempts = 16; // Safety limit
-
-        do {
-            sample = mean + random.nextGaussian() * stddev;
-            attempts++;
-
-            // Safety: if we can't find a valid sample, just use the mean
-            if (attempts > maxAttempts) {
-                sample = Math.clamp(mean, AutoClutchConfig.MIN_BLOCKS, AutoClutchConfig.MAX_BLOCKS);
-                break;
-            }
-        } while (sample < AutoClutchConfig.MIN_BLOCKS || sample > AutoClutchConfig.MAX_BLOCKS);
-
-        logger.info("Sample {} from truncated normal distribution with mean {} and standard deviation {}", sample, mean, stddev);
-
-        return sample;
     }
 }

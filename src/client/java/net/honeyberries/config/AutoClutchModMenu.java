@@ -8,17 +8,14 @@ import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
-import dev.isxander.yacl3.api.controller.DoubleSliderControllerBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import java.util.Locale;
 
 /**
  * ModMenu integration for AutoClutch.
  * <p>
- * Provides a YACL-powered config screen with safe sliders for mean and variance,
- * and a toggle for enabling/disabling the mod. All values are clamped to safe ranges.
+ * Provides a YACL-powered config screen with toggles for enabling/disabling the mod
+ * and its water bucket clutch behavior.
  */
 public class AutoClutchModMenu implements ModMenuApi {
     /**
@@ -60,39 +57,6 @@ public class AutoClutchModMenu implements ModMenuApi {
                                         .description(OptionDescription.of(Component.translatable("config.autoclutch.enable_water.description")))
                                         .binding(true, () -> AutoClutchConfig.getInstance().enableWater, value -> AutoClutchConfig.getInstance().enableWater = value)
                                         .controller(BooleanControllerBuilder::create)
-                                        .build())
-                                .build())
-                        // Timing group: mean and variance sliders
-                        .group(OptionGroup.createBuilder()
-                                .name(Component.translatable("config.autoclutch.group.timing"))
-                                .description(OptionDescription.of(Component.translatable("config.autoclutch.group.timing.description")))
-                                // Mean slider
-                                .option(Option.<Double>createBuilder()
-                                        .name(Component.translatable("config.autoclutch.mean"))
-                                        .description(OptionDescription.of(Component.translatable("config.autoclutch.mean.description")))
-                                        .binding(
-                                                AutoClutchConfig.DEFAULT_MEAN_BLOCKS,
-                                                () -> AutoClutchConfig.getInstance().meanBlocks,
-                                                value -> AutoClutchConfig.getInstance().meanBlocks = value
-                                        )
-                                        .controller(option -> DoubleSliderControllerBuilder.create(option)
-                                                .range(AutoClutchConfig.MIN_BLOCKS, AutoClutchConfig.MAX_BLOCKS)
-                                                .step(0.1)
-                                                .formatValue(value -> Component.literal(String.format(Locale.ROOT, "%.1f blocks", value))))
-                                        .build())
-                                // Variance slider
-                                .option(Option.<Double>createBuilder()
-                                        .name(Component.translatable("config.autoclutch.variance"))
-                                        .description(OptionDescription.of(Component.translatable("config.autoclutch.variance.description")))
-                                        .binding(
-                                                AutoClutchConfig.DEFAULT_VARIANCE_BLOCKS,
-                                                () -> AutoClutchConfig.getInstance().varianceBlocks,
-                                                value -> AutoClutchConfig.getInstance().varianceBlocks = value
-                                        )
-                                        .controller(option -> DoubleSliderControllerBuilder.create(option)
-                                                .range(AutoClutchConfig.MIN_VARIANCE_BLOCKS, AutoClutchConfig.MAX_VARIANCE_BLOCKS)
-                                                .step(0.1)
-                                                .formatValue(value -> Component.literal(String.format(Locale.ROOT, "%.1f blocks", value))))
                                         .build())
                                 .build())
                         .build())

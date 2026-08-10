@@ -16,20 +16,8 @@ public class AutoClutchConfig {
 
     private static AutoClutchConfig INSTANCE = new AutoClutchConfig();
 
-    public static final double DEFAULT_MEAN_BLOCKS = 4.2;
-    public static final double DEFAULT_VARIANCE_BLOCKS = 0.7;
-
     public boolean enabled = true;
-    public double meanBlocks = DEFAULT_MEAN_BLOCKS;
-    public double varianceBlocks = DEFAULT_VARIANCE_BLOCKS;
     public boolean enableWater = true;
-
-    // Derived bounds - not serialized
-    public static final double MIN_BLOCKS = 0.1;
-    public static final double MAX_BLOCKS = 4.5;
-
-    public static final double MIN_VARIANCE_BLOCKS = 0.0;
-    public static final double MAX_VARIANCE_BLOCKS = 2.0;
 
     public static AutoClutchConfig getInstance() {
         return INSTANCE;
@@ -41,7 +29,6 @@ public class AutoClutchConfig {
                 String json = Files.readString(CONFIG_PATH);
                 AutoClutchConfig loaded = GSON.fromJson(json, AutoClutchConfig.class);
                 INSTANCE = loaded != null ? loaded : new AutoClutchConfig();
-                INSTANCE.sanitize();
                 AutoClutch.LOGGER.info("Config loaded from {}", CONFIG_PATH);
             } catch (IOException | JsonParseException e) {
                 AutoClutch.LOGGER.error("Failed to load config, using defaults", e);
@@ -54,7 +41,6 @@ public class AutoClutchConfig {
 
     public static void save() {
         try {
-            INSTANCE.sanitize();
             Files.createDirectories(CONFIG_PATH.getParent());
             String json = GSON.toJson(INSTANCE);
             Files.writeString(CONFIG_PATH, json);
@@ -62,11 +48,6 @@ public class AutoClutchConfig {
         } catch (IOException e) {
             AutoClutch.LOGGER.error("Failed to save config", e);
         }
-    }
-
-    public void sanitize() {
-        meanBlocks = Math.clamp(meanBlocks, MIN_BLOCKS, MAX_BLOCKS);
-        varianceBlocks = Math.clamp(varianceBlocks, MIN_VARIANCE_BLOCKS, MAX_VARIANCE_BLOCKS);
     }
 
 }
