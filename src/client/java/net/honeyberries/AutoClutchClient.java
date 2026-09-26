@@ -9,7 +9,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
 
 /**
@@ -36,8 +35,8 @@ public class AutoClutchClient implements ClientModInitializer {
 
         KeyMapping toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.autoclutch.togglekeybind",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_B,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.KEY_B,
                 AUTOCLUTCH_CATEGORY));
 
 
