@@ -22,16 +22,9 @@
 			"net.honeyberries.AutoClutchClient"
 		],
 		"modmenu": [
-          "net.honeyberries.config.AutoClutchModMenu"
+			"net.honeyberries.config.AutoClutchModMenu"
 		]
 	},
-	"mixins": [
-		"autoclutch.mixins.json",
-		{
-			"config": "autoclutch.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": "*",
 		"minecraft": "~26.3",

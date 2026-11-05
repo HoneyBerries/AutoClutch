@@ -27,14 +27,14 @@ public class AutoClutchClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         // Load configuration from disk
-        AutoClutchConfig.load();
+        AutoClutchConfig.HANDLER.load();
 
         KeyMapping.Category AUTOCLUTCH_CATEGORY = KeyMapping.Category.register(
             Identifier.fromNamespaceAndPath(AutoClutch.MOD_ID, "keybinds")
         );
 
         KeyMapping toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.autoclutch.togglekeybind",
+                "key.autoclutch.toggle_autoclutch",
                 InputConstants.Type.KEYBOARD,
                 InputConstants.KEY_B,
                 AUTOCLUTCH_CATEGORY));
@@ -46,9 +46,9 @@ public class AutoClutchClient implements ClientModInitializer {
 
             // Handle toggle keybind presses
             while (toggleKey.consumeClick()) {
-                boolean newState = !AutoClutchConfig.getInstance().enabled;
-                AutoClutchConfig.getInstance().enabled = newState;
-                AutoClutchConfig.save();
+                boolean newState = !AutoClutchConfig.config().enabled;
+                AutoClutchConfig.config().enabled = newState;
+                AutoClutchConfig.saveAsync();
 
                 // Show a message to the player when toggling
                 if (client.player != null) {

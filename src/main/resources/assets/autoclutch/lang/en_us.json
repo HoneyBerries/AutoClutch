@@ -1,20 +1,14 @@
 {
   "key.category.autoclutch.keybinds": "AutoClutch Keybinds",
-  "key.autoclutch.togglekeybind": "Toggle AutoClutch",
-
-  "config.autoclutch.title": "AutoClutch Config",
-  "config.autoclutch.category.general": "General Settings",
-  "config.autoclutch.category.general.tooltip": "Configure AutoClutch behavior",
-
-  "config.autoclutch.group.general": "General",
-  "config.autoclutch.group.general.description": "Basic mod settings",
-
-  "config.autoclutch.enabled": "Enable AutoClutch",
-  "config.autoclutch.enabled.description": "Toggle the mod on/off. When disabled, clutching will not be automated.",
-
-  "config.autoclutch.enable_water": "Enable Water Bucket",
-  "config.autoclutch.enable_water.description": "Allow clutching with water buckets",
-
+  "key.autoclutch.toggle_autoclutch": "Toggle AutoClutch",
   "text.autoclutch.enabled": "AutoClutch Enabled",
-  "text.autoclutch.disabled": "AutoClutch Disabled"
+  "text.autoclutch.disabled": "AutoClutch Disabled",
+  "yacl3.config.autoclutch:config.title": "AutoClutch Config",
+  "yacl3.config.autoclutch:config.category.general": "General Settings",
+  "yacl3.config.autoclutch:config.category.general.group.general": "General",
+  "yacl3.config.autoclutch:config.category.general.group.general.desc": "Basic mod settings",
+  "yacl3.config.autoclutch:config.enabled": "Enable AutoClutch",
+  "yacl3.config.autoclutch:config.enabled.desc": "Toggle the mod on/off. When disabled, clutching will not be automated.",
+  "yacl3.config.autoclutch:config.enableWater": "Enable Water Bucket",
+  "yacl3.config.autoclutch:config.enableWater.desc": "Allow clutching with water buckets"
 }

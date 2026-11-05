@@ -93,3 +93,41 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+// YACL derives every config-screen label from the field name and the @AutoGen group/category, but
+// the English text itself has to live in en_us.json. A missing key only shows up as a raw key
+// string when the screen is opened, so fail the build instead.
+val checkConfigLangKeys by tasks.registering {
+	val configSrc = file("src/client/java/net/honeyberries/config/AutoClutchConfig.java")
+	val langFile = file("src/main/resources/assets/autoclutch/lang/en_us.json")
+	inputs.files(configSrc, langFile)
+	doLast {
+		val src = configSrc.readText()
+		val lang = langFile.readText()
+		val prefix = "yacl3.config.autoclutch:config."
+		val categories = mapOf("GENERAL" to "general")
+		val fieldRegex = Regex("""@AutoGen\(category\s*=\s*(\w+),\s*group\s*=\s*"(\w+)"\)[^;]*?public\s+\w+\s+(\w+)\s*=""")
+		val required = linkedSetOf<String>()
+		val fields = mutableSetOf<String>()
+		for (m in fieldRegex.findAll(src)) {
+			val cat = categories[m.groupValues[1]] ?: m.groupValues[1].lowercase()
+			required += "${prefix}category.$cat"
+			required += "${prefix}category.$cat.group.${m.groupValues[2]}"
+			required += "${prefix}category.$cat.group.${m.groupValues[2]}.desc"
+			required += "$prefix${m.groupValues[3]}"
+			required += "$prefix${m.groupValues[3]}.desc"
+			fields += m.groupValues[3]
+		}
+		required += "${prefix.removeSuffix(".")}.title"
+		val present = Regex("\"(yacl3\\.config\\.autoclutch:config\\.[^\"]+)\"\\s*:").findAll(lang).map { it.groupValues[1] }.toSet()
+		val missing = required - present
+		val stale = present.filter { key ->
+			val rest = key.removePrefix(prefix).removeSuffix(".desc")
+			!rest.startsWith("category.") && rest != "title" && rest !in fields
+		}
+		if (fields.isEmpty()) throw GradleException("checkConfigLangKeys found no @AutoGen fields; the regex is out of date")
+		if (missing.isNotEmpty() || stale.isNotEmpty()) {
+			throw GradleException("en_us.json is out of sync with AutoClutchConfig.\n  missing: $missing\n  stale: $stale")
+		}
+	}
+}
+tasks.named("check") { dependsOn(checkConfigLangKeys) }

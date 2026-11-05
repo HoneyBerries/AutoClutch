@@ -1,53 +1,50 @@
 package net.honeyberries.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
+import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
+import dev.isxander.yacl3.config.v2.api.SerialEntry;
+import dev.isxander.yacl3.config.v2.api.autogen.AutoGen;
+import dev.isxander.yacl3.config.v2.api.autogen.TickBox;
+import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.honeyberries.AutoClutch;
+import net.minecraft.resources.Identifier;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
+/**
+ * Configuration for AutoClutch, built on YACL's annotation-based {@code @AutoGen} system.
+ * <p>
+ * Labels live in {@code en_us.json} under {@code yacl3.config.autoclutch:config.*}; the
+ * {@code checkConfigLangKeys} Gradle task fails the build if any is missing.
+ * Field names must be unique because option lang keys are scoped by field name only.
+ * The config is stored at {@code config/autoclutch.json}.
+ */
 public class AutoClutchConfig {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("autoclutch.json");
+    public static final ConfigClassHandler<AutoClutchConfig> HANDLER = ConfigClassHandler
+            .createBuilder(AutoClutchConfig.class)
+            .id(Identifier.fromNamespaceAndPath(AutoClutch.MOD_ID, "config"))
+            .serializer(config -> GsonConfigSerializerBuilder.create(config)
+                    .setPath(FabricLoader.getInstance().getConfigDir().resolve("autoclutch.json"))
+                    .build())
+            .build();
 
-    private static AutoClutchConfig INSTANCE = new AutoClutchConfig();
+    /** @return the live config instance. */
+    public static AutoClutchConfig config() {
+        return HANDLER.instance();
+    }
 
+    /** Saves the config off the tick thread. */
+    public static void saveAsync() {
+        Thread.startVirtualThread(HANDLER::save);
+    }
+
+    private static final String GENERAL = "general";
+
+    @SerialEntry
+    @AutoGen(category = GENERAL, group = "general")
+    @TickBox
     public boolean enabled = true;
+
+    @SerialEntry
+    @AutoGen(category = GENERAL, group = "general")
+    @TickBox
     public boolean enableWater = true;
-
-    public static AutoClutchConfig getInstance() {
-        return INSTANCE;
-    }
-
-    public static void load() {
-        if (Files.exists(CONFIG_PATH)) {
-            try {
-                String json = Files.readString(CONFIG_PATH);
-                AutoClutchConfig loaded = GSON.fromJson(json, AutoClutchConfig.class);
-                INSTANCE = loaded != null ? loaded : new AutoClutchConfig();
-                AutoClutch.LOGGER.info("Config loaded from {}", CONFIG_PATH);
-            } catch (IOException | JsonParseException e) {
-                AutoClutch.LOGGER.error("Failed to load config, using defaults", e);
-            }
-        } else {
-            save();
-        }
-    }
-
-
-    public static void save() {
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            String json = GSON.toJson(INSTANCE);
-            Files.writeString(CONFIG_PATH, json);
-            AutoClutch.LOGGER.info("Config saved to {}", CONFIG_PATH);
-        } catch (IOException e) {
-            AutoClutch.LOGGER.error("Failed to save config", e);
-        }
-    }
-
 }

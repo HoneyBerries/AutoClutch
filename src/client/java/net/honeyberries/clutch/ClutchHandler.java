@@ -26,6 +26,9 @@ public class ClutchHandler {
     /** Minecraft's default survival block interaction (reach) range, in blocks. */
     private static final double TRIGGER_DISTANCE_BLOCKS = 4.5;
 
+    /** How far below the eyes to scan for ground, in blocks. Must exceed the trigger distance. */
+    private static final int MAX_SCAN_BLOCKS = 6;
+
     /** True if the player is currently falling and clutch logic is active. */
     private boolean isActiveAndFalling = false;
 
@@ -44,7 +47,7 @@ public class ClutchHandler {
      */
     public void tick(Minecraft client) {
         // If the mod is disabled, reset state and do nothing
-        if (!AutoClutchConfig.getInstance().enabled) {
+        if (!AutoClutchConfig.config().enabled) {
             reset();
             return;
         }
@@ -55,13 +58,9 @@ public class ClutchHandler {
             return;
         }
 
-        // Calculate eye-level distance to ground
-        double distanceToGround = getEyeDistanceToGround(player, client.level);
-        logger.debug("Eye distance to ground: {}", distanceToGround);
-
-        // Check if player is falling and will take damage
-        boolean willTakeDamage = player.fallDistance > 3.0
-                && !player.onGround()
+        // Check if player is airborne, falling and will take damage
+        boolean willTakeDamage = !player.onGround()
+                && player.fallDistance > 3.0
                 && Objects.requireNonNull(player.gameMode()).isSurvival();
 
         // Reset if conditions aren't met
@@ -86,6 +85,8 @@ public class ClutchHandler {
             return;
         }
 
+        // Only scan for ground while airborne, falling and holding a bucket
+        double distanceToGround = getEyeDistanceToGround(player, client.level);
 
         // Trigger water bucket placement once within reach distance of the ground
         if (distanceToGround > 0 && distanceToGround <= TRIGGER_DISTANCE_BLOCKS) {
@@ -109,7 +110,7 @@ public class ClutchHandler {
      * @return True if the player is holding a water bucket and it's enabled.
      */
     private boolean isHoldingClutchMaterial(LocalPlayer player) {
-        if (!AutoClutchConfig.getInstance().enableWater) {
+        if (!AutoClutchConfig.config().enableWater) {
             return false;
         }
 
@@ -144,7 +145,7 @@ public class ClutchHandler {
      *
      * @param player The player whose position to check.
      * @param level  The world level.
-     * @return The distance in blocks from the player's eyes to the ground, or -1 if no ground found within 128 blocks.
+     * @return The distance in blocks from the player's eyes to the ground, or -1 if no ground found within {@link #MAX_SCAN_BLOCKS} blocks.
      */
     private double getEyeDistanceToGround(LocalPlayer player, Level level) {
         Vec3 playerPos = player.position();
@@ -153,8 +154,8 @@ public class ClutchHandler {
         // Start from the player's eye position and scan downward
         double startY = player.getEyeY();
 
-        // Check up to 128 blocks down
-        for (int i = 0; i < 128; i++) {
+        // Check up to MAX_SCAN_BLOCKS blocks down
+        for (int i = 0; i < MAX_SCAN_BLOCKS; i++) {
             pos.set(playerPos.x, startY - i, playerPos.z);
             BlockState state = level.getBlockState(pos);
 
@@ -165,7 +166,7 @@ public class ClutchHandler {
             }
         }
 
-        // No ground found within 128 blocks
+        // No ground found within scan range
         return -1;
     }
 
