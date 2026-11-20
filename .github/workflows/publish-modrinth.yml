@@ -57,7 +57,9 @@ jobs:
           files: build/libs/!(*-sources).jar
 
           game-versions: ${{ steps.version_info.outputs.minecraft_version }}
-          loaders: fabric
+          loaders: |
+            fabric
+            quilt
 
           changelog: Release ${{ steps.version_info.outputs.mod_version }}
           version-type: ${{ steps.version_info.outputs.release_type }}
