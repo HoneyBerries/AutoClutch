@@ -36,7 +36,7 @@ public class AutoClutchClient implements ClientModInitializer {
         KeyMapping toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.autoclutch.toggle_autoclutch",
                 InputConstants.Type.KEYBOARD,
-                InputConstants.KEY_B,
+                InputConstants.UNKNOWN.getValue(),
                 AUTOCLUTCH_CATEGORY));
 
 
