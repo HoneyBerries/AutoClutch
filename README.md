@@ -50,7 +50,7 @@ The mod creates a configuration file at `config/autoclutch.json` with the follow
 
 | Option | Type | Range | Default | Description |
 |--------|------|-------|---------|-------------|
-| `enabled` | boolean | — | `true` | Enable or disable the mod. Can also be toggled with the 'B' key in-game |
+| `enabled` | boolean | — | `true` | Enable or disable the mod. Can also be toggled with a keybind in-game (unbound by default; set it in Controls) |
 | `enableWater` | boolean | — | `true` | Enable or disable automatic water bucket placement |
 
 The trigger distance itself (4.5 blocks, Minecraft's default survival block reach) is fixed and not configurable.
