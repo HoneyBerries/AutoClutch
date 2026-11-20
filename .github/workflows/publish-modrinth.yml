@@ -61,5 +61,10 @@ jobs:
             fabric
             quilt
 
+          dependencies: |
+            fabric-api(required){modrinth:fabric-api}
+            yacl(required){modrinth:yacl}
+            modmenu(required){modrinth:modmenu}
+
           changelog: Release ${{ steps.version_info.outputs.mod_version }}
           version-type: ${{ steps.version_info.outputs.release_type }}

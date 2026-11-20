@@ -29,9 +29,11 @@ The mod detects when you're falling and automatically places a water bucket once
 
 1. Install [Fabric Loader](https://fabricmc.net/use/) for Minecraft 26.3
 2. Install [Fabric API](https://modrinth.com/mod/fabric-api) 0.165.0+ or later
-3. Download AutoClutch JAR from [GitHub Releases](https://github.com/HoneyBerries/AutoClutch/releases)
-4. Place the JAR file in your `.minecraft/mods` folder
-5. Launch Minecraft with Fabric
+3. Install [YACL3 (Yet Another Config Lib)](https://modrinth.com/mod/yacl) 3.9.7+26.3-fabric or later (required for the config GUI)
+4. Install [Mod Menu](https://modrinth.com/mod/modmenu) 21.0.0 or later (required for config access)
+5. Download AutoClutch JAR from [GitHub Releases](https://github.com/HoneyBerries/AutoClutch/releases)
+6. Place the JAR file in your `.minecraft/mods` folder
+7. Launch Minecraft with Fabric
 
 ## Configuration
 
